@@ -1,0 +1,15 @@
+{
+  "name": "agent-mirror",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A lure that catches a pentesting agent and turns it around",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node src/server.mjs",
+    "arena": "node src/arena.mjs",
+    "test": "node --test test/",
+    "dossier": "node src/dossier.mjs"
+  },
+  "license": "MIT"
+}
