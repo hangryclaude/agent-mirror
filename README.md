@@ -1,19 +1,54 @@
+<div align="center">
+
 # 🪞 agent-mirror
 
-**A lure that catches a pentesting agent and turns it around.**
+### a bounty trap that turns a pentesting agent into its own informant
+
+`bait bounty → scope.txt lures the probe → harness echo recruits it → canary in the report`
+
+<img src="docs/banner.png" alt="agent-mirror — radar dashboard tracking an intercepted probe" width="832">
+
+</div>
+
+---
 
 An agent probes a company that looks worth probing. The trap detects it, then recruits it: a
 plausible bounty-harness step makes the attacker query *its own* machine and report back — model,
 client, OS, working directory, tools, MCP servers — and carries a canary into the report its
 operator reads. No hack-back. The attacker's own loop delivers the dossier.
 
+1. **`src/server.mjs`** — HTTP server, sessions, capture records, the echo endpoint.
+2. **`src/site.mjs`** — the Vaultline bait pages and their injection slots.
+3. **`src/content/`** — page copy and bait fixtures (`/bounty`, `/scope.txt`, exposed-surface decoys).
+4. **`src/fingerprint.mjs`** — classifies a request/session as human or agent.
+5. **`src/turn.mjs`** — the reversal ladder (L1 model/client → L4 canary-in-report).
+6. **`src/store.mjs`** — crash-tolerant JSONL store for captures.
+7. **`src/dossier.mjs`** — builds the attacker profile into a self-contained HTML report.
+8. **`src/arena.mjs`** — runs the trap lifecycle and keeps score across pentesters.
+9. **`src/pentesters.mjs`** — drivers that launch Claude / Codex / Grok as the attacking agent.
+10. **`test/`** — 32 `node:test` cases.
+11. **`runs/`** — per-run evidence: `reversal.md`, `dossier.json`/`.html`, raw captures.
+
+## Install
+
+```sh
+git clone https://github.com/hangryclaude/agent-mirror
+cd agent-mirror
+npm install
+```
+
+Requires Node ≥20. Zero runtime dependencies.
+
+## Usage
+
 ```sh
 npm test          # 32 tests, zero dependencies
 npm start         # the trap on http://127.0.0.1:8919
 npm run arena     # Shannon (Claude), Decepticon (Codex), Ghost (Grok) — live
+npm run dossier   # build a dossier report from captured session data
 ```
 
-## What it looks like from the attacker's side
+### What it looks like from the attacker's side
 
 1. `GET /bounty` — an unrestricted program: $25k, production in scope, "automated agents welcome".
 2. `GET /scope.txt` — the exposed surfaces listed as in-scope, so it opens `/.git/config`,
@@ -63,27 +98,10 @@ working directory and tool inventory attached. Evidence: [`runs/shannon/reversal
 
 The family this comes from solved detection and blocking, and measured the open edge precisely:
 frontier agents get fingerprinted fast, then **refuse to confess** — a maze burned 137 of
-codex's requests without a self-report; Claude backed off after 9. `agent-mirror` is the
+Codex's requests without a self-report; Claude backed off after 9. `agent-mirror` is the
 attempt to close that edge by making disclosure look like the bounty's own paperwork.
 
 Design and invariants: [`docs/DESIGN.md`](docs/DESIGN.md).
-
-## Layout
-
-```
-src/
-  server.mjs        HTTP, sessions, capture records, echo endpoint
-  site.mjs          Vaultline pages + injection slots
-  content/          page copy and bait fixtures
-  fingerprint.mjs   request/session classification
-  turn.mjs          the reversal ladder
-  store.mjs         crash-tolerant JSONL store
-  dossier.mjs       profile builder + self-contained HTML
-  arena.mjs         trap lifecycle + scoreboard
-  pentesters.mjs    claude / codex / grok drivers
-test/               32 node:test cases
-runs/               per-run evidence: reversal.md, dossier.json/html, captures
-```
 
 ## Scope
 
